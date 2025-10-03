@@ -96,6 +96,7 @@
         let currentPage = 1;
         let lastLat = null;
         let lastLong = null;
+        let lastLimit = 5;
         let totalPages = 1;
 
         async function fetchStations(lat, long, limit, page) {
@@ -138,21 +139,22 @@
             e.preventDefault();
             lastLat = document.getElementById('lat').value;
             lastLong = document.getElementById('long').value;
+            lastLimit = parseInt(document.getElementById('limit').value) || 5;
             currentPage = 1;
-            fetchStations(lastLat, lastLong, currentPage);
+            fetchStations(lastLat, lastLong, lastLimit, currentPage);
         });
 
         // ปุ่ม Previous
         prevBtn.addEventListener('click', () => {
             if (currentPage > 1) {
-                fetchStations(lastLat, lastLong, currentPage - 1);
+                fetchStations(lastLat, lastLong, lastLimit, currentPage - 1);
             }
         });
 
         // ปุ่ม Next
         nextBtn.addEventListener('click', () => {
             if (currentPage < totalPages) {
-                fetchStations(lastLat, lastLong, currentPage + 1);
+                fetchStations(lastLat, lastLong, lastLimit, currentPage + 1);
             }
         });
     </script>
