@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Nearby Stations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            margin-top: 5px;
+            padding: 5px;
+            width: 200px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>ค้นหาสถานีรถไฟใกล้คุณ</h2>
+    <form id="searchForm">
+        <label>Latitude:
+            <input type="text" id="lat" required />
+        </label>
+        <label>Longitude:
+            <input type="text" id="long" required />
+        </label>
+        <label>จำนวนสถานีที่ต้องการ:
+            <input type="number" id="limit" value="5" min="1" />
+        </label>
+        <button type="submit">Search</button>
+    </form>
+
+    <h3>ผลลัพธ์:</h3>
+    <table id="results">
+        <thead>
+            <tr>
+                <th>Page</th>
+                <th>Name</th>
+                <th>English Name</th>
+                <th>Lat</th>
+                <th>Long</th>
+                <th>Distance (km)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="pagination" style="margin-top:10px;">
+        <button id="prevBtn">Previous</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button id="goIndex">ไปหน้าเริ่มต้น</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const resultsBody = document.querySelector('#results tbody');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const goIndexBtn = document.getElementById('goIndex');
+
+        goIndexBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        let currentPage = 1;
+        let lastLat = null;
+        let lastLong = null;
+        let totalPages = 1;
+
+        async function fetchStations(lat, long, limit, page) {
+            try {
+                const res = await fetch(`http://localhost:3000/nearby-stations-pagination?lat=${lat}&long=${long}&limit=${limit}&page=${page}`);
+                if (!res.ok) throw new Error('Network response not ok');
+                const data = await res.json();
+
+                resultsBody.innerHTML = '';
+                data.data.forEach(station => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+        <td>${data.page}</td>
+        <td>${station.name}</td>
+        <td>${station.en_name}</td>
+        <td>${station.lat}</td>
+        <td>${station.long}</td>
+        <td>${station.distance.toFixed(2)}</td>
+      `;
+                    resultsBody.appendChild(row);
+                });
+
+                // อัปเดตหน้า
+                currentPage = data.page;
+                totalPages = data.totalPages;
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+                // ปิดปุ่มเมื่ออยู่หน้าแรก/สุด
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+
+            } catch (err) {
+                console.error(err);
+                alert('Error fetching data');
+            }
+        }
+
+        // Search submit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            lastLat = document.getElementById('lat').value;
+            lastLong = document.getElementById('long').value;
+            currentPage = 1;
+            fetchStations(lastLat, lastLong, currentPage);
+        });
+
+        // ปุ่ม Previous
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                fetchStations(lastLat, lastLong, currentPage - 1);
+            }
+        });
+
+        // ปุ่ม Next
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                fetchStations(lastLat, lastLong, currentPage + 1);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

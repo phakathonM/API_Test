@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Station {
+  id              Int     @id
+  station_code    Int?
+  name            String?
+  en_name         String?
+  th_short        String?
+  en_short        String?
+  chname          String?
+  controldivision Int?
+  exact_km        Float?
+  exact_distance  Float?
+  km              Float?
+  class           Int?
+  lat             Float?
+  long            Float?
+  active          Boolean?
+  giveway         Boolean?
+  dual_track      Boolean?
+  comment         String?
+
+  @@map("stations") // mapping ให้ตรงชื่อ table เดิม
+}

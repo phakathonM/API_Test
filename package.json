@@ -1,0 +1,27 @@
+{
+  "name": "api-to-postgres",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm index.ts",
+    "server": "node --loader ts-node/esm server.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "prisma": "^6.16.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.5.0",
+    "@types/pg": "^8.6.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.0"
+  }
+}

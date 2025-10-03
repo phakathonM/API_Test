@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Nearby Stations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input {
+      margin-top: 5px;
+      padding: 5px;
+      width: 200px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 8px 15px;
+    }
+
+    table {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>ค้นหาสถานีรถไฟใกล้คุณ</h2>
+  <form id="searchForm">
+    <label>Latitude:
+      <input type="text" id="lat" required />
+    </label>
+    <label>Longitude:
+      <input type="text" id="long" required />
+    </label>
+    <label>จำนวนสถานีที่ต้องการ:
+      <input type="number" id="limit" value="5" min="1" />
+    </label>
+    <button type="submit">Search</button>
+  </form>
+
+  <h3>ผลลัพธ์:</h3>
+  <table id="results">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>English Name</th>
+        <th>Lat</th>
+        <th>Long</th>
+        <th>Distance (km)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div style="margin-top: 10px;">
+    <button id="goPagination">ไปหน้า Pagination</button>
+  </div>
+
+  <script>
+    const form = document.getElementById('searchForm');
+    const resultsBody = document.querySelector('#results tbody');
+    const goPaginationBtn = document.getElementById('goPagination');
+
+    goPaginationBtn.addEventListener('click', () => {
+      window.location.href = 'index-pagination.html';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultsBody.innerHTML = '';
+
+      const lat = document.getElementById('lat').value;
+      const long = document.getElementById('long').value;
+      const limit = document.getElementById('limit').value;
+
+      try {
+        const res = await fetch(`http://localhost:3000/nearby-stations?lat=${lat}&long=${long}&limit=${limit}`);
+        const data = await res.json();
+
+        data.forEach(station => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${station.name}</td>
+            <td>${station.en_name}</td>
+            <td>${station.lat}</td>
+            <td>${station.long}</td>
+            <td>${station.distance.toFixed(2)}</td>
+          `;
+          resultsBody.appendChild(row);
+        });
+      } catch (err) {
+        alert('Error fetching data');
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+
+</html>
